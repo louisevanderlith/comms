@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 
 	"github.com/astaxie/beego"
-	"github.com/louisevanderlith/mango/core/comms"
-	"github.com/louisevanderlith/mango/pkg/control"
+	"github.com/louisevanderlith/comms/core"
+	"github.com/louisevanderlith/mango/control"
 )
 
 type MessageController struct {
@@ -26,7 +26,7 @@ func NewMessageCtrl(ctrlMap *control.ControllerMap) *MessageController {
 // @Failure 403 body is empty
 // @router / [post]
 func (req *MessageController) Post() {
-	var message comms.Message
+	var message core.Message
 	json.Unmarshal(req.Ctx.Input.RequestBody, &message)
 
 	if message.To == "" {
@@ -44,7 +44,7 @@ func (req *MessageController) Post() {
 // @router /all/:pagesize [get]
 func (req *MessageController) Get() {
 	page, size := req.GetPageData()
-	result := comms.GetMessages(page, size)
+	result := core.GetMessages(page, size)
 
 	req.Serve(result, nil)
 }

@@ -8,24 +8,22 @@
 package routers
 
 import (
-	"github.com/louisevanderlith/mango/api/comms/controllers"
-	"github.com/louisevanderlith/mango/pkg"
+	"github.com/louisevanderlith/comms/controllers"
+	"github.com/louisevanderlith/mango"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/plugins/cors"
-	"github.com/louisevanderlith/mango/pkg/control"
-	"github.com/louisevanderlith/mango/pkg/enums"
+	"github.com/louisevanderlith/mango/control"
+	"github.com/louisevanderlith/mango/enums"
 )
 
 func Setup(s *mango.Service) {
 	ctrlmap := EnableFilters(s)
 
-	ns := beego.NewNamespace("/v1",
-		beego.NSNamespace("/message",
-			beego.NSInclude(
-				controllers.NewMessageCtrl(ctrlmap))))
+	msgCtrl := controllers.NewMessageCtrl(ctrlmap)
 
-	beego.AddNamespace(ns)
+	beego.Router("/v1/messge", msgCtrl, "post:Post")
+	beego.Router("/v1/message/:pageData[A-Z](?:_?[0-9]+)*", msgCtrl, "get:Get")
 }
 
 func EnableFilters(s *mango.Service) *control.ControllerMap {
