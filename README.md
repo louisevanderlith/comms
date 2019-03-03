@@ -3,7 +3,7 @@ Mango API: Communications
 
 ## Run with Docker
 *$ go build
-*$ docker build -t avosa/comms:dev .
+*$ docker build -t avosa/comms:latest .
 *$ docker rm commsDEV
-*$ docker run -d -p 8085:8085 --network mango_net --name commsDEV avosa/comms:dev
+*$ docker run -d -e RUNMODE=DEV -p 8085:8085 --network mango_net --name CommsDEV avosa/comms:latest
 *$ docker logs commsDEV

@@ -2,6 +2,7 @@ package core
 
 import (
 	"log"
+	"os"
 
 	"github.com/astaxie/beego"
 	"github.com/louisevanderlith/husk"
@@ -28,7 +29,7 @@ func GetMessages(page, size int) husk.Collection {
 }
 
 func (m Message) SendMessage() error {
-	if beego.BConfig.RunMode != "dev" {
+	if os.Getenv("RUNMODE") != "DEV" {
 		body := populatTemplate(m)
 		sendErr := sendEmail(body, m.Name, m.To)
 
