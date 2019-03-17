@@ -22,8 +22,9 @@ func Setup(s *mango.Service) {
 
 	msgCtrl := controllers.NewMessageCtrl(ctrlmap)
 
-	beego.Router("/v1/messge", msgCtrl, "post:Post")
-	beego.Router("/v1/message/:pageData[A-Z](?:_?[0-9]+)*", msgCtrl, "get:Get")
+	beego.Router("/v1/message", msgCtrl, "post:Post")
+	beego.Router("/v1/message/:key", msgCtrl, "get:GetOne")
+	beego.Router("/v1/message/all/:pageSize", msgCtrl, "get:Get")
 }
 
 func EnableFilters(s *mango.Service) *control.ControllerMap {
@@ -39,7 +40,7 @@ func EnableFilters(s *mango.Service) *control.ControllerMap {
 	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
 		AllowAllOrigins: true,
 		AllowMethods:    []string{"GET", "POST", "OPTIONS"},
-		AllowHeaders:    []string{"Origin", "Authorization", "Access-Control-Allow-Origin", "Content-Type"},
+		AllowHeaders:    []string{"Origin", "Authorization", "Access-Control-Allow-Origin", "Content-Type", "User-Agent"},
 		ExposeHeaders:   []string{"Content-Length", "Access-Control-Allow-Origin"},
 	}))
 

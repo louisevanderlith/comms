@@ -5,6 +5,7 @@ import (
 
 	"github.com/astaxie/beego"
 	"github.com/louisevanderlith/comms/core"
+	"github.com/louisevanderlith/husk"
 	"github.com/louisevanderlith/mango/control"
 )
 
@@ -47,4 +48,24 @@ func (req *MessageController) Get() {
 	result := core.GetMessages(page, size)
 
 	req.Serve(result, nil)
+}
+
+// @Title GetMessage
+// @Description Gets a comms message
+// @Param	key			path	string 	true		"comms key"
+// @Success 200 {core.Message} core.Message
+// @router /:key [get]
+func (req *MessageController) GetOne() {
+	siteParam := req.Ctx.Input.Param(":key")
+
+	key, err := husk.ParseKey(siteParam)
+
+	if err != nil {
+		req.Serve(nil, err)
+		return
+	}
+
+	result, err := core.GetMessage(key)
+
+	req.Serve(result, err)
 }

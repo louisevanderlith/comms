@@ -28,6 +28,16 @@ func GetMessages(page, size int) husk.Collection {
 	return ctx.Messages.Find(page, size, husk.Everything())
 }
 
+func GetMessage(key husk.Key) (*Message, error) {
+	rec, err := ctx.Messages.FindByKey(key)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return rec.Data().(*Message), nil
+}
+
 func (m Message) SendMessage() error {
 	if os.Getenv("RUNMODE") != "DEV" {
 		body := populatTemplate(m)
