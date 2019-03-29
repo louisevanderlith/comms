@@ -1,7 +1,8 @@
-package comms
+package core
 
 import (
 	"log"
+	"os"
 
 	"github.com/astaxie/beego"
 	"github.com/louisevanderlith/husk"
@@ -27,8 +28,18 @@ func GetMessages(page, size int) husk.Collection {
 	return ctx.Messages.Find(page, size, husk.Everything())
 }
 
+func GetMessage(key husk.Key) (*Message, error) {
+	rec, err := ctx.Messages.FindByKey(key)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return rec.Data().(*Message), nil
+}
+
 func (m Message) SendMessage() error {
-	if beego.BConfig.RunMode != "dev" {
+	if os.Getenv("RUNMODE") != "DEV" {
 		body := populatTemplate(m)
 		sendErr := sendEmail(body, m.Name, m.To)
 

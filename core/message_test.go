@@ -1,4 +1,4 @@
-package comms
+package core
 
 import "testing"
 

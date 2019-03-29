@@ -1,4 +1,4 @@
-package comms
+package core
 
 import (
 	"github.com/louisevanderlith/husk"

@@ -8,27 +8,26 @@
 package routers
 
 import (
-	"github.com/louisevanderlith/mango/api/comms/controllers"
-	"github.com/louisevanderlith/mango/pkg"
+	"github.com/louisevanderlith/comms/controllers"
+	"github.com/louisevanderlith/mango"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/plugins/cors"
-	"github.com/louisevanderlith/mango/pkg/control"
-	"github.com/louisevanderlith/mango/pkg/enums"
+	"github.com/louisevanderlith/mango/control"
+	"github.com/louisevanderlith/mango/enums"
 )
 
-func Setup(s *util.Service) {
+func Setup(s *mango.Service) {
 	ctrlmap := EnableFilters(s)
 
-	ns := beego.NewNamespace("/v1",
-		beego.NSNamespace("/message",
-			beego.NSInclude(
-				controllers.NewMessageCtrl(ctrlmap))))
+	msgCtrl := controllers.NewMessageCtrl(ctrlmap)
 
-	beego.AddNamespace(ns)
+	beego.Router("/v1/message", msgCtrl, "post:Post")
+	beego.Router("/v1/message/:key", msgCtrl, "get:GetOne")
+	beego.Router("/v1/message/all/:pageSize", msgCtrl, "get:Get")
 }
 
-func EnableFilters(s *util.Service) *control.ControllerMap {
+func EnableFilters(s *mango.Service) *control.ControllerMap {
 	ctrlmap := control.CreateControlMap(s)
 
 	emptyMap := make(control.ActionMap)
@@ -41,7 +40,7 @@ func EnableFilters(s *util.Service) *control.ControllerMap {
 	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
 		AllowAllOrigins: true,
 		AllowMethods:    []string{"GET", "POST", "OPTIONS"},
-		AllowHeaders:    []string{"Origin", "Authorization", "Access-Control-Allow-Origin", "Content-Type"},
+		AllowHeaders:    []string{"Origin", "Authorization", "Access-Control-Allow-Origin", "Content-Type", "User-Agent"},
 		ExposeHeaders:   []string{"Content-Length", "Access-Control-Allow-Origin"},
 	}))
 

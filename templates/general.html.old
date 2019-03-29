@@ -18,7 +18,7 @@
         <img src="=encodedImage" alt="avosa logo" />
     </p>
     <p>
-        {{.data.message}}
+        {{.Data.message}}
     </p>
     <p>
         This message was sent to you by
