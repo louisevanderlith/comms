@@ -34,16 +34,16 @@ func EnableFilters(s *mango.Service) *control.ControllerMap {
 	emptyMap := make(secure.ActionMap)
 	emptyMap["GET"] = roletype.Admin
 
-	ctrlmap.Add("/message", emptyMap)
+	ctrlmap.Add("/v1/message", emptyMap)
 
-	beego.InsertFilter("/*", beego.BeforeRouter, ctrlmap.FilterAPI)
+	beego.InsertFilter("/v1/*", beego.BeforeRouter, ctrlmap.FilterAPI, false)
 
 	beego.InsertFilter("*", beego.BeforeRouter, cors.Allow(&cors.Options{
 		AllowAllOrigins: true,
 		AllowMethods:    []string{"GET", "POST", "OPTIONS"},
 		AllowHeaders:    []string{"Origin", "Authorization", "Access-Control-Allow-Origin", "Content-Type", "User-Agent"},
 		ExposeHeaders:   []string{"Content-Length", "Access-Control-Allow-Origin"},
-	}))
+	}), false)
 
 	return ctrlmap
 }
