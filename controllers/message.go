@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"encoding/json"
+	"net/http"
 
 	"github.com/astaxie/beego"
 	"github.com/louisevanderlith/comms/core"
@@ -36,7 +37,12 @@ func (req *MessageController) Post() {
 
 	err := message.SendMessage()
 
-	req.Serve("Message has been sent.", err)
+	if err != nil {
+		req.Serve(http.StatusInternalServerError, err, nil)
+		return
+	}
+
+	req.Serve(http.StatusOK, nil, "Message has been sent.")
 }
 
 // @Title GetMessages
@@ -47,7 +53,7 @@ func (req *MessageController) Get() {
 	page, size := req.GetPageData()
 	result := core.GetMessages(page, size)
 
-	req.Serve(result, nil)
+	req.Serve(http.StatusOK, nil, result)
 }
 
 // @Title GetMessage
@@ -61,11 +67,16 @@ func (req *MessageController) GetOne() {
 	key, err := husk.ParseKey(siteParam)
 
 	if err != nil {
-		req.Serve(nil, err)
+		req.Serve(http.StatusNotFound, err, nil)
 		return
 	}
 
 	result, err := core.GetMessage(key)
 
-	req.Serve(result, err)
+	if err != nil {
+		req.Serve(http.StatusNotFound, err, nil)
+		return
+	}
+
+	req.Serve(http.StatusOK, nil, result)
 }
