@@ -1,5 +1,6 @@
 # comms
 Mango API: Comms
+Email, SMS and other Messages are all to handled by Comms.
 
 ## Run with Docker
 * $ docker build -t avosa/comms:dev .
