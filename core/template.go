@@ -1,23 +1,38 @@
 package core
 
 import (
-	"io/ioutil"
+	"bufio"
+	"bytes"
+	"html/template"
+	"path"
 )
 
-func populatTemplate(msg Message) string {
-	template, _ := rawTemplate()
-	render := template
+func populatTemplate(msg Message) (string, error) {
+	tmplName := msg.TemplateName
 
-	return render
-}
-
-func rawTemplate() (string, error) {
-	result := ""
-	file, err := ioutil.ReadFile("general.html")
-
-	if err == nil {
-		result = string(file)
+	if len(tmplName) == 0 {
+		tmplName = "base.html"
 	}
 
-	return result, err
+	files := []string{
+		path.Join("templates", "base.html"),
+		path.Join("templates", msg.TemplateName),
+	}
+
+	tmpl, err := template.ParseFiles(files...)
+
+	if err != nil {
+		return "", err
+	}
+
+	var b bytes.Buffer
+	w := bufio.NewWriter(&b)
+
+	err = tmpl.Execute(w, msg)
+
+	if err != nil {
+		return "", err
+	}
+
+	return b.String(), nil
 }

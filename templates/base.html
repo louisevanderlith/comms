@@ -8,17 +8,14 @@
     <meta name="author" content="avosa Software">
 
     <title>avosa Notification</title>
-
     <style>
+    
     </style>
 </head>
 
 <body>
     <p>
-        <img src="=encodedImage" alt="avosa logo" />
-    </p>
-    <p>
-        {{.Data.message}}
+        {{block "message" .}} {{end}}
     </p>
     <p>
         This message was sent to you by

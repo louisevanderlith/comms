@@ -1,0 +1,6 @@
+{{template "create.html" .}}
+{{define "message"}}
+Thank you {{.Data.Name}} for registering.
+
+Please follow this link to <a href="{{.Data.Body}}" target="_blank">activate your account</a>.
+{{end}}
