@@ -11,13 +11,14 @@ import (
 )
 
 type Message struct {
-	Name  string `hsk:"size(50)"`
-	Email string `hsk:"size(128)"`
-	Phone string `hsk:"size(15)"`
-	Body  string `hsk:"size(1024)"`
-	To    string `hsk:"null;size(128)"`
-	Sent  bool   `hsk:"default(false)"`
-	Error string `hsk:"null;size(2048)"`
+	Name         string `hsk:"size(50)"`
+	Email        string `hsk:"size(128)"`
+	Phone        string `hsk:"size(15)"`
+	Body         string `hsk:"size(1024)"`
+	To           string `hsk:"null;size(128)"`
+	Sent         bool   `hsk:"default(false)"`
+	Error        string `hsk:"null;size(2048)"`
+	TemplateName string `hsk:"null;size(18)"`
 }
 
 func (m Message) Valid() (bool, error) {
@@ -40,12 +41,17 @@ func GetMessage(key husk.Key) (*Message, error) {
 
 func (m Message) SendMessage() error {
 	if os.Getenv("RUNMODE") != "DEV" {
-		body := populatTemplate(m)
-		sendErr := sendEmail(body, m.Name, m.To)
+		body, err := populatTemplate(m)
 
-		if sendErr != nil {
+		if err != nil {
+			return err
+		}
+
+		err = sendEmail(body, m.Name, m.To)
+
+		if err != nil {
 			m.Sent = false
-			m.Error = sendErr.Error()
+			m.Error = err.Error()
 		} else {
 			m.Sent = true
 		}

@@ -1,0 +1,7 @@
+{{template "create.html" .}}
+{{define "message"}}
+Hi {{.Data.Name}}, 
+You have requested to Change your Password.
+
+Please follow this link to <a href="{{.Data.Body}}" target="_blank">reset </a>.
+{{end}}
