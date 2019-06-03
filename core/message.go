@@ -2,7 +2,6 @@ package core
 
 import (
 	"log"
-	"os"
 
 	"github.com/astaxie/beego"
 	"github.com/louisevanderlith/husk"
@@ -40,21 +39,19 @@ func GetMessage(key husk.Key) (*Message, error) {
 }
 
 func (m Message) SendMessage() error {
-	if os.Getenv("RUNMODE") != "DEV" {
-		body, err := populatTemplate(m)
+	body, err := populatTemplate(m)
 
-		if err != nil {
-			return err
-		}
+	if err != nil {
+		return err
+	}
 
-		err = sendEmail(body, m.Name, m.To)
+	err = sendEmail(body, m.Name, m.To)
 
-		if err != nil {
-			m.Sent = false
-			m.Error = err.Error()
-		} else {
-			m.Sent = true
-		}
+	if err != nil {
+		m.Sent = false
+		m.Error = err.Error()
+	} else {
+		m.Sent = true
 	}
 
 	set := ctx.Messages.Create(m)
