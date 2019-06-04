@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"path"
 
 	"github.com/louisevanderlith/mango"
 	"github.com/louisevanderlith/mango/enums"
@@ -32,7 +33,7 @@ func main() {
 	if err != nil {
 		log.Print("Register: ", err)
 	} else {
-		routers.Setup(srv)
+		routers.Setup(srv, host)
 		showSMTPInfo()
 		beego.Run()
 	}
