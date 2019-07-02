@@ -2,26 +2,17 @@ package core
 
 import "testing"
 
-func TestRawTemplate_NotEmpty(t *testing.T) {
-	actual, err := rawTemplate()
-
-	if err != nil {
-		t.Error(err)
-	}
-
-	if actual == "" {
-		t.Error("template is empty")
-	}
-}
-
 func TestPopulateTemplate(t *testing.T) {
-	actual, err := rawTemplate()
+	msg := Message{
+		Body: "Hello, This is me.",
+		Name: "Louise",
+	}
+
+	actual, err := PopulatTemplate(msg)
 
 	if err != nil {
 		t.Error(err)
 	}
 
-	if actual == "" {
-		t.Error("msg is empty")
-	}
+	t.Error(actual)
 }

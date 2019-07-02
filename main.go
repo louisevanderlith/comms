@@ -40,9 +40,9 @@ func main() {
 }
 
 func showSMTPInfo() {
-	smtpUser := beego.AppConfig.String("smtpUsername")
-	smtpAddress := beego.AppConfig.String("smtpAddress")
-	smtpPort := beego.AppConfig.String("smtpPort")
+	smtpUser := os.Getenv("SMTPUsername")
+	smtpAddress := os.Getenv("SMTPAddress")
+	smtpPort := os.Getenv("SMTPPort")
 
 	log.Print(smtpUser, smtpAddress, smtpPort)
 }
