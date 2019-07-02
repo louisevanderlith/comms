@@ -12,5 +12,6 @@
 *.out
 
 comms
-db/
+
+db/*.husk
 !db/*.seed.json

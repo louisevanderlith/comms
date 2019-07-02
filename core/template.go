@@ -11,12 +11,12 @@ func populatTemplate(msg Message) (string, error) {
 	tmplName := msg.TemplateName
 
 	if len(tmplName) == 0 {
-		tmplName = "base.html"
+		tmplName = "default.html"
 	}
 
 	files := []string{
 		path.Join("templates", "base.html"),
-		path.Join("templates", msg.TemplateName),
+		path.Join("templates", tmplName),
 	}
 
 	tmpl, err := template.ParseFiles(files...)

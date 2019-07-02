@@ -35,6 +35,9 @@ func (req *MessageController) Post() {
 		message.To = beego.AppConfig.String("defaultEmail")
 	}
 
+	//Can be detected from Origin
+	message.TemplateName = "default.html"
+
 	err := message.SendMessage()
 
 	if err != nil {
