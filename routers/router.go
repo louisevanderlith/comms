@@ -1,29 +1,30 @@
 package routers
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/louisevanderlith/comms/controllers"
-	"github.com/louisevanderlith/mango"
+	"github.com/louisevanderlith/droxolite"
 
-	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/plugins/cors"
-	"github.com/louisevanderlith/mango/control"
-	secure "github.com/louisevanderlith/secure/core"
-	"github.com/louisevanderlith/secure/core/roletype"
+	"github.com/louisevanderlith/droxolite/roletype"
 )
 
-func Setup(s *mango.Service, host string) {
-	ctrlmap := EnableFilters(s, host)
+func Setup(poxy *droxolite.Epoxy) {
+	//Message
+	msgCtrl := &controllers.MessageController{}
+	msgGroup := droxolite.NewRouteGroup("message", msgCtrl)
+	msgGroup.AddRoute("Create Message", "", "POST", roletype.Unknown, msgCtrl.Post)
+	msgGroup.AddRoute("All Messages", "/all/{pagesize:[A-Z][0-9]+}", "GET", roletype.Admin, msgCtrl.Get)
+	msgGroup.AddRoute("View Message", "/{key:[0-9]+\x60[0-9]+}", "GET", roletype.Unknown, msgCtrl.GetOne)
+	poxy.AddGroup(msgGroup)
+	/*ctrlmap := EnableFilters(s, host)
 
 	msgCtrl := controllers.NewMessageCtrl(ctrlmap)
 
 	beego.Router("/v1/message", msgCtrl, "post:Post")
 	beego.Router("/v1/message/:key", msgCtrl, "get:GetOne")
-	beego.Router("/v1/message/all/:pageSize", msgCtrl, "get:Get")
+	beego.Router("/v1/message/all/:pageSize", msgCtrl, "get:Get")*/
 }
 
+/*
 func EnableFilters(s *mango.Service, host string) *control.ControllerMap {
 	ctrlmap := control.CreateControlMap(s)
 
@@ -42,3 +43,4 @@ func EnableFilters(s *mango.Service, host string) *control.ControllerMap {
 
 	return ctrlmap
 }
+*/

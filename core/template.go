@@ -1,22 +1,22 @@
 package core
 
 import (
-	"bufio"
-	"bytes"
 	"html/template"
 	"path"
+	"strings"
 )
 
-func populatTemplate(msg Message) (string, error) {
+func PopulatTemplate(msg Message) (string, error) {
 	tmplName := msg.TemplateName
 
 	if len(tmplName) == 0 {
-		tmplName = "base.html"
+		tmplName = "default.html"
 	}
 
 	files := []string{
 		path.Join("templates", "base.html"),
-		path.Join("templates", msg.TemplateName),
+		path.Join("templates", tmplName),
+		path.Join("templates", "style.html"),
 	}
 
 	tmpl, err := template.ParseFiles(files...)
@@ -25,14 +25,12 @@ func populatTemplate(msg Message) (string, error) {
 		return "", err
 	}
 
-	var b bytes.Buffer
-	w := bufio.NewWriter(&b)
-
-	err = tmpl.Execute(w, msg)
+	var strBuild strings.Builder
+	err = tmpl.Execute(&strBuild, msg)
 
 	if err != nil {
 		return "", err
 	}
 
-	return b.String(), nil
+	return strBuild.String(), nil
 }

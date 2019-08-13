@@ -1,4 +1,4 @@
-FROM golang:1.11 as build_base
+FROM golang:1.12 as build_base
 
 WORKDIR /box
 
@@ -20,7 +20,7 @@ FROM scratch
 
 COPY --from=builder /box/comms .
 COPY conf conf
-COPY templates ./templates
+COPY templates templates
 
 EXPOSE 8085
 

@@ -2,8 +2,9 @@ package core
 
 import (
 	"log"
+	"os"
+	"strconv"
 
-	"github.com/astaxie/beego"
 	"github.com/louisevanderlith/husk"
 
 	"gopkg.in/gomail.v2"
@@ -39,7 +40,7 @@ func GetMessage(key husk.Key) (*Message, error) {
 }
 
 func (m Message) SendMessage() error {
-	body, err := populatTemplate(m)
+	body, err := PopulatTemplate(m)
 
 	if err != nil {
 		return err
@@ -55,20 +56,21 @@ func (m Message) SendMessage() error {
 	}
 
 	set := ctx.Messages.Create(m)
+	defer ctx.Messages.Save()
 
 	return set.Error
 }
 
 func sendEmail(body, name, to string) error {
-	smtpUser := beego.AppConfig.String("smtpUsername")
-	smtpPass := beego.AppConfig.String("smtpPassword")
-	smtpAddress := beego.AppConfig.String("smtpAddress")
-	smtpPort, _ := beego.AppConfig.Int("smtpPort")
+	smtpUser := os.Getenv("SMTPUsername")
+	smtpPass := os.Getenv("SMTPPassword")
+	smtpAddress := os.Getenv("SMTPAddress")
+	smtpPort, _ := strconv.Atoi(os.Getenv("SMTPPort"))
 
 	gm := gomail.NewMessage()
 	gm.SetHeader("From", smtpUser)
 	gm.SetHeader("To", to)
-	gm.SetHeader("Subject", "Contact Us - "+name)
+	gm.SetHeader("Subject", "Avosa Notification")
 	gm.SetBody("text/html", body)
 
 	d := gomail.NewDialer(smtpAddress, smtpPort, smtpUser, smtpPass)

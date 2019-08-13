@@ -1,24 +1,15 @@
 package controllers
 
 import (
-	"encoding/json"
 	"net/http"
 
-	"github.com/astaxie/beego"
 	"github.com/louisevanderlith/comms/core"
+	"github.com/louisevanderlith/droxolite/xontrols"
 	"github.com/louisevanderlith/husk"
-	"github.com/louisevanderlith/mango/control"
 )
 
 type MessageController struct {
-	control.APIController
-}
-
-func NewMessageCtrl(ctrlMap *control.ControllerMap) *MessageController {
-	result := &MessageController{}
-	result.SetInstanceMap(ctrlMap)
-
-	return result
+	xontrols.APICtrl
 }
 
 // @Title SendMessage
@@ -29,13 +20,17 @@ func NewMessageCtrl(ctrlMap *control.ControllerMap) *MessageController {
 // @router / [post]
 func (req *MessageController) Post() {
 	var message core.Message
-	json.Unmarshal(req.Ctx.Input.RequestBody, &message)
+	err := req.Body(&message)
 
-	if message.To == "" {
-		message.To = beego.AppConfig.String("defaultEmail")
+	if err != nil {
+		req.Serve(http.StatusBadRequest, nil, err)
+		return
 	}
 
-	err := message.SendMessage()
+	//Can be detected from Origin
+	message.TemplateName = "default.html"
+
+	err = message.SendMessage()
 
 	if err != nil {
 		req.Serve(http.StatusInternalServerError, err, nil)
@@ -62,7 +57,7 @@ func (req *MessageController) Get() {
 // @Success 200 {core.Message} core.Message
 // @router /:key [get]
 func (req *MessageController) GetOne() {
-	siteParam := req.Ctx.Input.Param(":key")
+	siteParam := req.FindParam("key")
 
 	key, err := husk.ParseKey(siteParam)
 
