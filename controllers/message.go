@@ -4,12 +4,11 @@ import (
 	"net/http"
 
 	"github.com/louisevanderlith/comms/core"
-	"github.com/louisevanderlith/droxolite/xontrols"
+	"github.com/louisevanderlith/droxolite/context"
 	"github.com/louisevanderlith/husk"
 )
 
 type MessageController struct {
-	xontrols.APICtrl
 }
 
 // @Title SendMessage
@@ -18,13 +17,12 @@ type MessageController struct {
 // @Success 200 {map[string]string} map[string]string
 // @Failure 403 body is empty
 // @router / [post]
-func (req *MessageController) Post() {
+func (req *MessageController) Post(ctx context.Contexer) (int, interface{}) {
 	var message core.Message
-	err := req.Body(&message)
+	err := ctx.Body(&message)
 
 	if err != nil {
-		req.Serve(http.StatusBadRequest, nil, err)
-		return
+		return http.StatusBadRequest, err
 	}
 
 	//Can be detected from Origin
@@ -33,22 +31,21 @@ func (req *MessageController) Post() {
 	err = message.SendMessage()
 
 	if err != nil {
-		req.Serve(http.StatusInternalServerError, err, nil)
-		return
+		return http.StatusInternalServerError, err
 	}
 
-	req.Serve(http.StatusOK, nil, "Message has been sent.")
+	return http.StatusOK, "Message has been sent."
 }
 
 // @Title GetMessages
 // @Description Gets all Messages
 // @Success 200 {[]comms.Message]} []comms.Message]
 // @router /all/:pagesize [get]
-func (req *MessageController) Get() {
-	page, size := req.GetPageData()
+func (req *MessageController) Get(ctx context.Contexer) (int, interface{}) {
+	page, size := ctx.GetPageData()
 	result := core.GetMessages(page, size)
 
-	req.Serve(http.StatusOK, nil, result)
+	return http.StatusOK, result
 }
 
 // @Title GetMessage
@@ -56,22 +53,20 @@ func (req *MessageController) Get() {
 // @Param	key			path	string 	true		"comms key"
 // @Success 200 {core.Message} core.Message
 // @router /:key [get]
-func (req *MessageController) GetOne() {
-	siteParam := req.FindParam("key")
+func (req *MessageController) GetOne(ctx context.Contexer) (int, interface{}) {
+	siteParam := ctx.FindParam("key")
 
 	key, err := husk.ParseKey(siteParam)
 
 	if err != nil {
-		req.Serve(http.StatusNotFound, err, nil)
-		return
+		return http.StatusNotFound, err
 	}
 
 	result, err := core.GetMessage(key)
 
 	if err != nil {
-		req.Serve(http.StatusNotFound, err, nil)
-		return
+		return http.StatusNotFound, err
 	}
 
-	req.Serve(http.StatusOK, nil, result)
+	return http.StatusOK, result
 }
