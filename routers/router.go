@@ -1,6 +1,9 @@
 package routers
 
 import (
+	"net/http"
+
+	"github.com/gorilla/mux"
 	"github.com/louisevanderlith/comms/controllers"
 
 	"github.com/louisevanderlith/droxolite/mix"
@@ -9,7 +12,10 @@ import (
 )
 
 func Setup(e resins.Epoxi) {
-	e.JoinBundle("/", roletype.User, mix.JSON, &controllers.Messages{})
+	msgCtrl := &controllers.Messages{}
+	e.JoinBundle("/", roletype.Admin, mix.JSON, msgCtrl)
+	e.JoinPath(e.Router().(*mux.Router), "/submit", "Submit Contact", http.MethodPost, roletype.Unknown, mix.JSON, msgCtrl.Create)
+
 	//Message
 	/*msgCtrl := &controllers.MessageController{}
 	msgGroup := routing.NewRouteGroup("message", mix.JSON)

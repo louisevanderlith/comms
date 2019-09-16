@@ -56,9 +56,12 @@ func (m Message) SendMessage() error {
 	}
 
 	set := ctx.Messages.Create(m)
-	defer ctx.Messages.Save()
 
-	return set.Error
+	if set.Error != nil {
+		return set.Error
+	}
+
+	return ctx.Messages.Save()
 }
 
 func sendEmail(body, name, to string) error {
