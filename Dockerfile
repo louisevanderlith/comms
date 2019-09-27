@@ -19,7 +19,6 @@ RUN CGO_ENABLED="0" go build
 FROM scratch
 
 COPY --from=builder /box/comms .
-COPY conf conf
 COPY templates templates
 
 EXPOSE 8085
