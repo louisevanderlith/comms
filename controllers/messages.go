@@ -11,7 +11,7 @@ import (
 type Messages struct {
 }
 
-func (x *Messages) Get(ctx context.Requester) (int, interface{}) {
+func (x *Messages) Get(c *gin.Context) {
 	result := core.GetMessages(1, 10)
 
 	return http.StatusOK, result
@@ -23,7 +23,7 @@ func (x *Messages) Get(ctx context.Requester) (int, interface{}) {
 // @Success 200 {map[string]string} map[string]string
 // @Failure 403 body is empty
 // @router / [post]
-func (req *Messages) Create(ctx context.Requester) (int, interface{}) {
+func (req *Messages) Create(c *gin.Context) {
 	var message core.Message
 	err := ctx.Body(&message)
 
@@ -47,7 +47,7 @@ func (req *Messages) Create(ctx context.Requester) (int, interface{}) {
 // @Description Gets all Messages
 // @Success 200 {[]comms.Message]} []comms.Message]
 // @router /all/:pagesize [get]
-func (req *Messages) Search(ctx context.Requester) (int, interface{}) {
+func (req *Messages) Search(c *gin.Context) {
 	page, size := ctx.GetPageData()
 	result := core.GetMessages(page, size)
 
@@ -59,8 +59,8 @@ func (req *Messages) Search(ctx context.Requester) (int, interface{}) {
 // @Param	key			path	string 	true		"comms key"
 // @Success 200 {core.Message} core.Message
 // @router /:key [get]
-func (req *Messages) View(ctx context.Requester) (int, interface{}) {
-	siteParam := ctx.FindParam("key")
+func (req *Messages) View(c *gin.Context) {
+	siteParam := c.Param("key")
 
 	key, err := husk.ParseKey(siteParam)
 
