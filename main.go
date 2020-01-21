@@ -1,18 +1,10 @@
 package main
 
 import (
-	"os"
-	"path"
-	"strconv"
-
+	"github.com/gin-gonic/gin"
+	"github.com/louisevanderlith/comms/controllers/message"
 	"github.com/louisevanderlith/comms/core"
-	"github.com/louisevanderlith/comms/routers"
-	"github.com/louisevanderlith/droxolite"
-	"github.com/louisevanderlith/droxolite/bodies"
-	"github.com/louisevanderlith/droxolite/do"
-	"github.com/louisevanderlith/droxolite/element"
-	"github.com/louisevanderlith/droxolite/resins"
-	"github.com/louisevanderlith/droxolite/servicetype"
+	"github.com/louisevanderlith/droxo"
 )
 
 func main() {
@@ -21,17 +13,14 @@ func main() {
 
 	r := gin.Default()
 
-	r.GET("/article/:key", article.View)
+	r.GET("/message/:key", message.View)
 
-	articles := r.Group("/article")
-	articles.POST("", article.Create)
-	articles.PUT("/:key", article.Update)
-	articles.DELETE("/:key", article.Delete)
+	msgs := r.Group("/message")
+	msgs.Use(droxo.Authorize())
+	msgs.POST("", message.Create)
 
-	r.GET("/articles", article.Get)
-	r.GET("/articles/:pagesize/*hash", article.Search)
-
-	r.POST("/submit/Submit Contact", msgCtrl.Create)
+	r.GET("/messages", message.Get)
+	r.GET("/messages/:pagesize/*hash", message.Search)
 
 	err := r.Run(":8085")
 
@@ -39,40 +28,3 @@ func main() {
 		panic(err)
 	}
 }
-
-// func main() {
-// 	keyPath := os.Getenv("KEYPATH")
-// 	pubName := os.Getenv("PUBLICKEY")
-// 	host := os.Getenv("HOST")
-// 	httpport, _ := strconv.Atoi(os.Getenv("HTTPPORT"))
-// 	appName := os.Getenv("APPNAME")
-// 	pubPath := path.Join(keyPath, pubName)
-
-// 	// Register with router
-// 	srv := bodies.NewService(appName, "", pubPath, host, httpport, servicetype.API)
-
-// 	routr, err := do.GetServiceURL("", "Router.API", false)
-
-// 	if err != nil {
-// 		panic(err)
-// 	}
-
-// 	err = srv.Register(routr)
-
-// 	if err != nil {
-// 		panic(err)
-// 	}
-
-// 	poxy := resins.NewMonoEpoxy(srv, element.GetNoTheme(host, srv.ID, "none"))
-// 	routers.Setup(poxy)
-// 	poxy.EnableCORS(host)
-
-// 	core.CreateContext()
-// 	defer core.Shutdown()
-
-// 	err = droxolite.Boot(poxy)
-
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// }
