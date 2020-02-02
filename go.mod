@@ -2,7 +2,6 @@ module github.com/louisevanderlith/comms
 
 require (
 	github.com/gin-gonic/gin v1.5.0
-	github.com/gorilla/mux v1.7.3
 	github.com/louisevanderlith/droxo v1.2.0
 	github.com/louisevanderlith/husk v1.0.0
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect
