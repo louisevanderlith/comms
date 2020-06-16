@@ -1,11 +1,8 @@
 package core
 
 import (
-	"log"
-	"os"
-	"strconv"
-
 	"github.com/louisevanderlith/husk"
+	"log"
 
 	"gopkg.in/gomail.v2"
 )
@@ -25,28 +22,28 @@ func (m Message) Valid() (bool, error) {
 	return husk.ValidateStruct(&m)
 }
 
-func GetMessages(page, size int) husk.Collection {
+func GetMessages(page, size int) (husk.Collection, error) {
 	return ctx.Messages.Find(page, size, husk.Everything())
 }
 
-func GetMessage(key husk.Key) (*Message, error) {
+func GetMessage(key husk.Key) (husk.Dataer, error) {
 	rec, err := ctx.Messages.FindByKey(key)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return rec.Data().(*Message), nil
+	return rec.Data(), nil
 }
 
-func (m Message) SendMessage() error {
+func (m Message) SendMessage(smtpUser, smtpPass, smtpHost string, smtpPort int) error {
 	body, err := PopulatTemplate(m)
 
 	if err != nil {
 		return err
 	}
 
-	err = sendEmail(body, m.Name, m.To)
+	err = sendEmail(body, m.Name, m.To, smtpUser, smtpPass, smtpHost, smtpPort)
 
 	if err != nil {
 		m.Sent = false
@@ -64,19 +61,14 @@ func (m Message) SendMessage() error {
 	return ctx.Messages.Save()
 }
 
-func sendEmail(body, name, to string) error {
-	smtpUser := os.Getenv("SMTPUsername")
-	smtpPass := os.Getenv("SMTPPassword")
-	smtpAddress := os.Getenv("SMTPAddress")
-	smtpPort, _ := strconv.Atoi(os.Getenv("SMTPPort"))
-
+func sendEmail(body, subject, to, smtpUser, smtpPass, smtpHost string, smtpPort int) error {
 	gm := gomail.NewMessage()
 	gm.SetHeader("From", smtpUser)
 	gm.SetHeader("To", to)
-	gm.SetHeader("Subject", "Avosa Notification")
+	gm.SetHeader("Subject", subject)
 	gm.SetBody("text/html", body)
 
-	d := gomail.NewDialer(smtpAddress, smtpPort, smtpUser, smtpPass)
+	d := gomail.NewDialer(smtpHost, smtpPort, smtpUser, smtpPass)
 
 	err := d.DialAndSend(gm)
 
