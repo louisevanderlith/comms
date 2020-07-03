@@ -3,9 +3,8 @@ class Message {
   final String email;
   final String name;
   final String phone;
-  final String to;
 
-  Message(this.message, this.email, this.name, this.phone, this.to);
+  Message(this.message, this.email, this.name, this.phone);
 
   Map<String, dynamic> toJson() {
     return {
@@ -13,7 +12,6 @@ class Message {
       "Email": email,
       "Name": name,
       "Phone": phone,
-      "To": to
     };
   }
 }

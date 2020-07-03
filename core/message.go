@@ -18,7 +18,7 @@ type Message struct {
 	TemplateName string `hsk:"null;size(18)"`
 }
 
-func (m Message) Valid() (bool, error) {
+func (m Message) Valid() error {
 	return husk.ValidateStruct(&m)
 }
 

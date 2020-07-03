@@ -8,7 +8,7 @@ import 'bodies/message.dart';
 
 Future<HttpRequest> sendMessage(Message obj) async {
   var apiroute = getEndpoint("comms");
-  var url = "${apiroute}/messages";
+  var url = "${apiroute}/message";
 
   return invokeService("POST", url, jsonEncode(obj.toJson()));
 }

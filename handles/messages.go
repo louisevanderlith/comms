@@ -41,9 +41,8 @@ func CreateMessage(smtpUser, smtpPass, smtpHost string, smtpPort int) http.Handl
 			return
 		}
 
-		//Can be detected from Origin
 		message.TemplateName = "default.html"
-		//message.To = ctx.GetTokenInfo().GetClaim(tokens.kongcontact)
+		message.To = ctx.GetTokenInfo().GetClaimString("profile.contact.email")
 
 		err = message.SendMessage(smtpUser, smtpPass, smtpHost, smtpPort)
 
