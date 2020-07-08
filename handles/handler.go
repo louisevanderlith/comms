@@ -15,7 +15,7 @@ func SetupRoutes(secureUrl, scrt, smtpUser, smtpPass, smtpHost string, smtpPort 
 
 	create := kong.ResourceMiddleware("comms.messages.create", scrt, secureUrl, CreateMessage(smtpUser, smtpPass, smtpHost, smtpPort))
 	r.HandleFunc("/message", create).Methods(http.MethodPost)
-
+	
 	search := kong.ResourceMiddleware("comms.messages.search", scrt, secureUrl, SearchMessages)
 	r.HandleFunc("/message/{pagesize:[A-Z][0-9]+}", search).Methods(http.MethodGet)
 	r.HandleFunc("/message/{pagesize:[A-Z][0-9]+}/{hash:[a-zA-Z0-9]+={0,2}}", search).Methods(http.MethodGet)

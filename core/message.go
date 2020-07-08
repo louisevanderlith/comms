@@ -52,10 +52,10 @@ func (m Message) SendMessage(smtpUser, smtpPass, smtpHost string, smtpPort int) 
 		m.Sent = true
 	}
 
-	set := ctx.Messages.Create(m)
+	_, err = ctx.Messages.Create(m)
 
-	if set.Error != nil {
-		return set.Error
+	if err != nil {
+		return err
 	}
 
 	return ctx.Messages.Save()

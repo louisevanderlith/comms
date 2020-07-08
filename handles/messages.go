@@ -1,8 +1,10 @@
 package handles
 
 import (
+	"errors"
 	"github.com/louisevanderlith/droxolite/mix"
 	"github.com/louisevanderlith/husk"
+	"github.com/louisevanderlith/kong/tokens"
 	"log"
 	"net/http"
 
@@ -41,19 +43,45 @@ func CreateMessage(smtpUser, smtpPass, smtpHost string, smtpPort int) http.Handl
 			return
 		}
 
+		email, err := emailFromClaims(ctx.GetTokenInfo())
+
+		if err != nil {
+			log.Println(err)
+			http.Error(w, "", http.StatusUnauthorized)
+			return
+		}
+
 		message.TemplateName = "default.html"
-		message.To = ctx.GetTokenInfo().GetClaimString("profile.contact.email")
+		message.To = email
 
 		err = message.SendMessage(smtpUser, smtpPass, smtpHost, smtpPort)
 
 		if err != nil {
-			log.Println(err)
+			log.Println("Send Message Error", err)
 			http.Error(w, "", http.StatusInternalServerError)
 			return
 		}
 
-		ctx.Serve(http.StatusOK, mix.JSON("Message Sent"))
+		err = ctx.Serve(http.StatusOK, mix.JSON("Message Sent"))
+
+		if err != nil {
+			log.Println("Serve Error", err)
+		}
 	}
+}
+
+func emailFromClaims(clms tokens.Claimer) (string, error) {
+	contacts := clms.GetClaim(tokens.KongContacts).([]interface{})
+
+	for _, v := range contacts {
+		cnt := v.(map[string]interface{})
+
+		if cnt["Name"] == "email" {
+			return cnt["Value"].(string), nil
+		}
+	}
+
+	return "", errors.New("no email claim")
 }
 
 // @Title GetMessages
