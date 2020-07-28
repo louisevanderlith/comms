@@ -19,7 +19,7 @@ type Message struct {
 }
 
 func (m Message) Valid() error {
-	return husk.ValidateStruct(&m)
+	return husk.ValidateStruct(m)
 }
 
 func GetMessages(page, size int) (husk.Collection, error) {
