@@ -11,6 +11,7 @@ import (
 
 func main() {
 	scurty := flag.String("security", "http://localhost:8086", "Security Provider's URL")
+	manager := flag.String("manager", "http://localhost:8097", "Manager Provider's URL")
 	srcSecrt := flag.String("scopekey", "secret", "Secret used to validate against scopes")
 	smtpUser := flag.String("smtpUsername", "frikkie@mango.avo", "User used to authenticate SMTP calls")
 	smtpPass := flag.String("smtpPassword", "not_real_password", "Password used to authenticate SMTP calls")
@@ -25,7 +26,7 @@ func main() {
 		ReadTimeout:  time.Second * 15,
 		WriteTimeout: time.Second * 15,
 		Addr:         ":8085",
-		Handler:      handles.SetupRoutes(*scurty, *srcSecrt, *smtpUser, *smtpPass, *smtpHost, *smtpPort),
+		Handler:      handles.SetupRoutes(*scurty, *manager, *srcSecrt, *smtpUser, *smtpPass, *smtpHost, *smtpPort),
 	}
 
 	err := srvr.ListenAndServe()

@@ -2,6 +2,7 @@ package handles
 
 import (
 	"errors"
+	"github.com/louisevanderlith/droxolite/drx"
 	"github.com/louisevanderlith/droxolite/mix"
 	"github.com/louisevanderlith/husk"
 	"github.com/louisevanderlith/kong/tokens"
@@ -9,11 +10,9 @@ import (
 	"net/http"
 
 	"github.com/louisevanderlith/comms/core"
-	"github.com/louisevanderlith/droxolite/context"
 )
 
 func GetMessage(w http.ResponseWriter, r *http.Request) {
-	ctx := context.New(w, r)
 	result, err := core.GetMessages(1, 10)
 
 	if err != nil {
@@ -22,7 +21,11 @@ func GetMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx.Serve(http.StatusOK, mix.JSON(result))
+	err = mix.Write(w, mix.JSON(result))
+
+	if err != nil {
+		log.Println("Serve Error", err)
+	}
 }
 
 // @Title SendMessage
@@ -33,9 +36,8 @@ func GetMessage(w http.ResponseWriter, r *http.Request) {
 // @router / [post]
 func CreateMessage(smtpUser, smtpPass, smtpHost string, smtpPort int) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		ctx := context.New(w, r)
 		var message core.Message
-		err := ctx.Body(&message)
+		err := drx.JSONBody(r, &message)
 
 		if err != nil {
 			log.Println(err)
@@ -43,7 +45,7 @@ func CreateMessage(smtpUser, smtpPass, smtpHost string, smtpPort int) http.Handl
 			return
 		}
 
-		email, err := emailFromClaims(ctx.GetTokenInfo())
+		email, err := emailFromClaims(drx.GetIdentity(r))
 
 		if err != nil {
 			log.Println(err)
@@ -62,7 +64,7 @@ func CreateMessage(smtpUser, smtpPass, smtpHost string, smtpPort int) http.Handl
 			return
 		}
 
-		err = ctx.Serve(http.StatusOK, mix.JSON("Message Sent"))
+		err = mix.Write(w, mix.JSON("Message Sent"))
 
 		if err != nil {
 			log.Println("Serve Error", err)
@@ -70,7 +72,7 @@ func CreateMessage(smtpUser, smtpPass, smtpHost string, smtpPort int) http.Handl
 	}
 }
 
-func emailFromClaims(clms tokens.Claimer) (string, error) {
+func emailFromClaims(clms tokens.Claims) (string, error) {
 	contacts := clms.GetClaim(tokens.KongContacts).([]interface{})
 
 	for _, v := range contacts {
@@ -89,8 +91,7 @@ func emailFromClaims(clms tokens.Claimer) (string, error) {
 // @Success 200 {[]comms.Message]} []comms.Message]
 // @router /all/:pagesize [get]
 func SearchMessages(w http.ResponseWriter, r *http.Request) {
-	ctx := context.New(w, r)
-	page, size := ctx.GetPageData()
+	page, size := drx.GetPageData(r)
 	result, err := core.GetMessages(page, size)
 
 	if err != nil {
@@ -99,7 +100,11 @@ func SearchMessages(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx.Serve(http.StatusOK, mix.JSON(result))
+	err = mix.Write(w, mix.JSON(result))
+
+	if err != nil {
+		log.Println("Serve Error", err)
+	}
 }
 
 // @Title GetMessage
@@ -108,8 +113,7 @@ func SearchMessages(w http.ResponseWriter, r *http.Request) {
 // @Success 200 {core.Message} core.Message
 // @router /:key [get]
 func ViewMessage(w http.ResponseWriter, r *http.Request) {
-	ctx := context.New(w, r)
-	siteParam := ctx.FindParam("key")
+	siteParam := drx.FindParam(r, "key")
 
 	key, err := husk.ParseKey(siteParam)
 
@@ -127,5 +131,9 @@ func ViewMessage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx.Serve(http.StatusOK, mix.JSON(result))
+	err = mix.Write(w, mix.JSON(result))
+
+	if err != nil {
+		log.Println("Serve Error", err)
+	}
 }
