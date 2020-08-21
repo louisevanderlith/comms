@@ -1,6 +1,7 @@
 package core
 
 import (
+	"crypto/tls"
 	"github.com/louisevanderlith/husk"
 	"log"
 
@@ -19,7 +20,7 @@ type Message struct {
 }
 
 func (m Message) Valid() error {
-	return husk.ValidateStruct(m)
+	return husk.ValidateStruct(&m)
 }
 
 func GetMessages(page, size int) (husk.Collection, error) {
@@ -69,6 +70,7 @@ func sendEmail(body, subject, to, smtpUser, smtpPass, smtpHost string, smtpPort 
 	gm.SetBody("text/html", body)
 
 	d := gomail.NewDialer(smtpHost, smtpPort, smtpUser, smtpPass)
+	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 
 	err := d.DialAndSend(gm)
 

@@ -9,14 +9,14 @@ import (
 
 func SetupRoutes(securityUrl, managerUrl, scrt, smtpUser, smtpPass, smtpHost string, smtpPort int) http.Handler {
 	r := mux.NewRouter()
-
-	view := kong.ResourceMiddleware(http.DefaultClient, "comms.messages.view", scrt, securityUrl, managerUrl, ViewMessage)
+	ins := kong.NewResourceInspector(http.DefaultClient, securityUrl, managerUrl)
+	view := ins.Middleware("comms.messages.view", scrt, ViewMessage)
 	r.HandleFunc("/message/{key:[0-9]+\\x60[0-9]+}", view).Methods(http.MethodGet)
 
-	create := kong.ResourceMiddleware(http.DefaultClient, "comms.messages.create", scrt, securityUrl, managerUrl, CreateMessage(smtpUser, smtpPass, smtpHost, smtpPort))
+	create := ins.Middleware("comms.messages.create", scrt, CreateMessage(smtpUser, smtpPass, smtpHost, smtpPort))
 	r.HandleFunc("/message", create).Methods(http.MethodPost)
 
-	search := kong.ResourceMiddleware(http.DefaultClient, "comms.messages.search", scrt, securityUrl, managerUrl, SearchMessages)
+	search := ins.Middleware("comms.messages.search", scrt, SearchMessages)
 	r.HandleFunc("/message/{pagesize:[A-Z][0-9]+}", search).Methods(http.MethodGet)
 	r.HandleFunc("/message/{pagesize:[A-Z][0-9]+}/{hash:[a-zA-Z0-9]+={0,2}}", search).Methods(http.MethodGet)
 
