@@ -4,7 +4,7 @@ import (
 	"errors"
 	"github.com/louisevanderlith/droxolite/drx"
 	"github.com/louisevanderlith/droxolite/mix"
-	"github.com/louisevanderlith/husk"
+	"github.com/louisevanderlith/husk/keys"
 	"github.com/louisevanderlith/kong/tokens"
 	"log"
 	"net/http"
@@ -115,7 +115,7 @@ func SearchMessages(w http.ResponseWriter, r *http.Request) {
 func ViewMessage(w http.ResponseWriter, r *http.Request) {
 	siteParam := drx.FindParam(r, "key")
 
-	key, err := husk.ParseKey(siteParam)
+	key, err := keys.ParseKey(siteParam)
 
 	if err != nil {
 		log.Println(err)

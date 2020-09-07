@@ -2,7 +2,10 @@ package core
 
 import (
 	"crypto/tls"
-	"github.com/louisevanderlith/husk"
+	"github.com/louisevanderlith/husk/hsk"
+	"github.com/louisevanderlith/husk/op"
+	"github.com/louisevanderlith/husk/records"
+	"github.com/louisevanderlith/husk/validation"
 	"log"
 
 	"gopkg.in/gomail.v2"
@@ -20,14 +23,14 @@ type Message struct {
 }
 
 func (m Message) Valid() error {
-	return husk.ValidateStruct(&m)
+	return validation.Struct(m)
 }
 
-func GetMessages(page, size int) (husk.Collection, error) {
-	return ctx.Messages.Find(page, size, husk.Everything())
+func GetMessages(page, size int) (records.Page, error) {
+	return ctx.Messages.Find(page, size, op.Everything())
 }
 
-func GetMessage(key husk.Key) (husk.Dataer, error) {
+func GetMessage(key hsk.Key) (validation.Dataer, error) {
 	rec, err := ctx.Messages.FindByKey(key)
 
 	if err != nil {
