@@ -37,7 +37,7 @@ func GetMessage(key hsk.Key) (validation.Dataer, error) {
 		return nil, err
 	}
 
-	return rec.Data(), nil
+	return rec.GetValue(), nil
 }
 
 func (m Message) SendMessage(smtpUser, smtpPass, smtpHost string, smtpPort int) error {
