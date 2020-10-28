@@ -2,32 +2,29 @@ package handles
 
 import (
 	"github.com/gorilla/mux"
-	"github.com/louisevanderlith/kong/middle"
+	"github.com/louisevanderlith/droxolite/open"
 	"github.com/rs/cors"
 	"net/http"
 )
 
-func SetupRoutes(securityUrl, managerUrl, scrt, smtpUser, smtpPass, smtpHost string, smtpPort int) http.Handler {
+func SetupRoutes(issuer, audience, smtpUser, smtpPass, smtpHost string, smtpPort int) http.Handler {
 	r := mux.NewRouter()
-	ins := middle.NewResourceInspector(http.DefaultClient, securityUrl, managerUrl)
-	view := ins.Middleware("comms.messages.view", scrt, ViewMessage)
-	r.HandleFunc("/message/{key:[0-9]+\\x60[0-9]+}", view).Methods(http.MethodGet)
+	mw := open.BearerMiddleware(audience, issuer)
+	r.Handle("/message/{key:[0-9]+\\x60[0-9]+}", mw.Handler(http.HandlerFunc(ViewMessage))).Methods(http.MethodGet)
 
-	create := ins.Middleware("comms.messages.create", scrt, CreateMessage(smtpUser, smtpPass, smtpHost, smtpPort))
-	r.HandleFunc("/message", create).Methods(http.MethodPost)
+	r.Handle("/message", mw.Handler(CreateMessage(smtpUser, smtpPass, smtpHost, smtpPort))).Methods(http.MethodPost)
 
-	search := ins.Middleware("comms.messages.search", scrt, SearchMessages)
-	r.HandleFunc("/message/{pagesize:[A-Z][0-9]+}", search).Methods(http.MethodGet)
-	r.HandleFunc("/message/{pagesize:[A-Z][0-9]+}/{hash:[a-zA-Z0-9]+={0,2}}", search).Methods(http.MethodGet)
+	r.Handle("/message/{pagesize:[A-Z][0-9]+}", mw.Handler(http.HandlerFunc(SearchMessages))).Methods(http.MethodGet)
+	r.Handle("/message/{pagesize:[A-Z][0-9]+}/{hash:[a-zA-Z0-9]+={0,2}}", mw.Handler(http.HandlerFunc(SearchMessages))).Methods(http.MethodGet)
 
-	lst, err := middle.Whitelist(http.DefaultClient, securityUrl, "comms.messages.view", scrt)
+	//lst, err := middle.Whitelist(http.DefaultClient, securityUrl, "comms.messages.view", scrt)
 
-	if err != nil {
-		panic(err)
-	}
+	//if err != nil {
+	//	panic(err)
+	//}
 
 	corsOpts := cors.New(cors.Options{
-		AllowedOrigins: lst,
+		AllowedOrigins: []string{"*"},
 		AllowedMethods: []string{
 			http.MethodGet,
 			http.MethodPost,

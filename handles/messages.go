@@ -45,16 +45,8 @@ func CreateMessage(smtpUser, smtpPass, smtpHost string, smtpPort int) http.Handl
 			return
 		}
 
-		email, err := emailFromClaims(drx.GetIdentity(r))
-
-		if err != nil {
-			log.Println(err)
-			http.Error(w, "", http.StatusUnauthorized)
-			return
-		}
-
 		message.TemplateName = "default.html"
-		message.To = email
+		//message.To = email
 
 		err = message.SendMessage(smtpUser, smtpPass, smtpHost, smtpPort)
 

@@ -2,8 +2,8 @@ module github.com/louisevanderlith/comms
 
 require (
 	github.com/gorilla/mux v1.7.4
-	github.com/louisevanderlith/droxolite v1.14.0
-	github.com/louisevanderlith/husk v1.7.4
+	github.com/louisevanderlith/droxolite v1.16.2
+	github.com/louisevanderlith/husk v1.7.5
 	github.com/louisevanderlith/kong v1.8.6
 	github.com/rs/cors v1.6.0
 	gopkg.in/alexcesaro/quotedprintable.v3 v3.0.0-20150716171945-2caba252f4dc // indirect

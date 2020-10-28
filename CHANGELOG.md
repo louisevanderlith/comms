@@ -1,5 +1,9 @@
 ## Mango-Comms
 
+# 1.0.3
+
+* Added 'To' field to Message
+
 # 1.0.2
 
 * Fixed Resource path
