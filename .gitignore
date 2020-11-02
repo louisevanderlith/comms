@@ -12,6 +12,11 @@
 *.out
 
 comms
+.dart_tool
+.packages
+pubspec.lock
 
 db/*.husk
 !db/*.seed.json
+
+cmd/cmd

@@ -1,11 +1,12 @@
 package core
 
 import (
+	"crypto/tls"
+	"github.com/louisevanderlith/husk/hsk"
+	"github.com/louisevanderlith/husk/op"
+	"github.com/louisevanderlith/husk/records"
+	"github.com/louisevanderlith/husk/validation"
 	"log"
-	"os"
-	"strconv"
-
-	"github.com/louisevanderlith/husk"
 
 	"gopkg.in/gomail.v2"
 )
@@ -21,32 +22,32 @@ type Message struct {
 	TemplateName string `hsk:"null;size(18)"`
 }
 
-func (m Message) Valid() (bool, error) {
-	return husk.ValidateStruct(&m)
+func (m Message) Valid() error {
+	return validation.Struct(m)
 }
 
-func GetMessages(page, size int) husk.Collection {
-	return ctx.Messages.Find(page, size, husk.Everything())
+func GetMessages(page, size int) (records.Page, error) {
+	return ctx.Messages.Find(page, size, op.Everything())
 }
 
-func GetMessage(key husk.Key) (*Message, error) {
+func GetMessage(key hsk.Key) (validation.Dataer, error) {
 	rec, err := ctx.Messages.FindByKey(key)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return rec.Data().(*Message), nil
+	return rec.GetValue(), nil
 }
 
-func (m Message) SendMessage() error {
+func (m Message) SendMessage(smtpUser, smtpPass, smtpHost string, smtpPort int) error {
 	body, err := PopulatTemplate(m)
 
 	if err != nil {
 		return err
 	}
 
-	err = sendEmail(body, m.Name, m.To)
+	err = sendEmail(body, m.Name, m.To, smtpUser, smtpPass, smtpHost, smtpPort)
 
 	if err != nil {
 		m.Sent = false
@@ -55,28 +56,24 @@ func (m Message) SendMessage() error {
 		m.Sent = true
 	}
 
-	set := ctx.Messages.Create(m)
+	_, err = ctx.Messages.Create(m)
 
-	if set.Error != nil {
-		return set.Error
+	if err != nil {
+		return err
 	}
 
 	return ctx.Messages.Save()
 }
 
-func sendEmail(body, name, to string) error {
-	smtpUser := os.Getenv("SMTPUsername")
-	smtpPass := os.Getenv("SMTPPassword")
-	smtpAddress := os.Getenv("SMTPAddress")
-	smtpPort, _ := strconv.Atoi(os.Getenv("SMTPPort"))
-
+func sendEmail(body, subject, to, smtpUser, smtpPass, smtpHost string, smtpPort int) error {
 	gm := gomail.NewMessage()
 	gm.SetHeader("From", smtpUser)
 	gm.SetHeader("To", to)
-	gm.SetHeader("Subject", "Avosa Notification")
+	gm.SetHeader("Subject", subject)
 	gm.SetBody("text/html", body)
 
-	d := gomail.NewDialer(smtpAddress, smtpPort, smtpUser, smtpPass)
+	d := gomail.NewDialer(smtpHost, smtpPort, smtpUser, smtpPass)
+	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 
 	err := d.DialAndSend(gm)
 

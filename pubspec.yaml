@@ -1,0 +1,9 @@
+name: mango_comms
+version: 1.0.3
+description: Wrapper for Comms API
+repository: https://github.com/louisevanderlith/comms
+homepage: https://github.com/louisevanderlith/comms
+environment:
+  sdk: '>=2.0.0 < 3.0.0'
+dependencies:
+  mango_ui: '^1.0.3'
