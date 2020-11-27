@@ -51,8 +51,7 @@ func CreateMessage(smtpUser, smtpPass, smtpHost string, smtpPort int) http.Handl
 		err = message.SendMessage(smtpUser, smtpPass, smtpHost, smtpPort)
 
 		if err != nil {
-			log.Println("Send Message Error", err)
-			http.Error(w, "", http.StatusInternalServerError)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 

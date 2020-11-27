@@ -13,6 +13,7 @@ import (
 
 type Message struct {
 	Name         string `hsk:"size(50)"`
+	Subject      string `hsk:"size(128)"`
 	Email        string `hsk:"size(128)"`
 	Phone        string `hsk:"size(15)"`
 	Body         string `hsk:"size(1024)"`
