@@ -1,5 +1,9 @@
 ## Mango-Comms
 
+# 1.0.4
+
+* Updated Message fields to match Model
+
 # 1.0.3
 
 * Added 'To' field to Message
